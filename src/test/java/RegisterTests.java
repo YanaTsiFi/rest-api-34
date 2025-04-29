@@ -151,15 +151,15 @@ public class RegisterTests {
                 .statusCode(415);
     }
 
-
     @Test
     void getUsersListTest() {
         given()
                 .header("x-api-key", API_KEY)
+                .queryParam("page", "2")
                 .log().uri()
 
                 .when()
-                .get("/users?page=2")
+                .get("/users")
 
                 .then()
                 .log().status()
