@@ -1,7 +1,7 @@
 package tests;
 
 import io.restassured.RestAssured;
-import models.lombok.*;
+import models.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,18 +23,16 @@ public class ReqresTests {
     @Test
     @DisplayName("Successful registration")
     void successfulRegisterTest() {
-        RegisterRequestLombokModel registerData = new RegisterRequestLombokModel();
-        registerData.setEmail("eve.holt@reqres.in");
-        registerData.setPassword("pistol");
+        RegisterRequest registerData = new RegisterRequest("eve.holt@reqres.in", "pistol");
 
-        RegisterResponseLombokModel response = step("Make registration request", () ->
+        RegisterResponse response = step("Make registration request", () ->
                 given(registerRequestSpec)
                         .header("x-api-key", API_KEY)
                         .body(registerData)
                         .post("/register")
                         .then()
                         .spec(registerResponseSpec)
-                        .extract().as(RegisterResponseLombokModel.class));
+                        .extract().as(RegisterResponse.class));
 
         step("Check response", () -> {
             assertEquals(4, response.getId());
@@ -45,13 +43,13 @@ public class ReqresTests {
     @Test
     @DisplayName("Unsuccessful registration with empty body")
     void unsuccessfulRegister400Test() {
-        ErrorResponseLombokModel response = step("Make registration request with empty body", () ->
+        ErrorResponse response = step("Make registration request with empty body", () ->
                 given(registerRequestSpec)
                         .header("x-api-key", API_KEY)
                         .post("/register")
                         .then()
                         .spec(missingFieldResponseSpec)
-                        .extract().as(ErrorResponseLombokModel.class));
+                        .extract().as(ErrorResponse.class));
 
         step("Check error message", () ->
                 assertEquals("Missing email or username", response.getError()));
@@ -60,18 +58,16 @@ public class ReqresTests {
     @Test
     @DisplayName("Registration with non-existent user")
     void userNotFoundRegisterTest() {
-        RegisterRequestLombokModel registerData = new RegisterRequestLombokModel();
-        registerData.setEmail("not.exist@reqres.in");
-        registerData.setPassword("pistol");
+        RegisterRequest registerData = new RegisterRequest("not.exist@reqres.in", "pistol");
 
-        ErrorResponseLombokModel response = step("Make registration request with non-existent user", () ->
+        ErrorResponse response = step("Make registration request with non-existent user", () ->
                 given(registerRequestSpec)
                         .header("x-api-key", API_KEY)
                         .body(registerData)
                         .post("/register")
                         .then()
                         .spec(missingFieldResponseSpec)
-                        .extract().as(ErrorResponseLombokModel.class));
+                        .extract().as(ErrorResponse.class));
 
         step("Check error message", () ->
                 assertEquals("Note: Only defined users succeed registration", response.getError()));
@@ -80,17 +76,16 @@ public class ReqresTests {
     @Test
     @DisplayName("Registration with missing password")
     void missingPasswordRegisterTest() {
-        RegisterRequestLombokModel registerData = new RegisterRequestLombokModel();
-        registerData.setEmail("eve.holt@reqres.in");
+        RegisterRequest registerData = new RegisterRequest("eve.holt@reqres.in", null);
 
-        ErrorResponseLombokModel response = step("Make registration request without password", () ->
+        ErrorResponse response = step("Make registration request without password", () ->
                 given(registerRequestSpec)
                         .header("x-api-key", API_KEY)
                         .body(registerData)
                         .post("/register")
                         .then()
                         .spec(missingFieldResponseSpec)
-                        .extract().as(ErrorResponseLombokModel.class));
+                        .extract().as(ErrorResponse.class));
 
         step("Check error message", () ->
                 assertEquals("Missing password", response.getError()));
@@ -99,17 +94,16 @@ public class ReqresTests {
     @Test
     @DisplayName("Registration with missing email")
     void missingEmailRegisterTest() {
-        RegisterRequestLombokModel registerData = new RegisterRequestLombokModel();
-        registerData.setPassword("pistol");
+        RegisterRequest registerData = new RegisterRequest(null, "pistol");
 
-        ErrorResponseLombokModel response = step("Make registration request without email", () ->
+        ErrorResponse response = step("Make registration request without email", () ->
                 given(registerRequestSpec)
                         .header("x-api-key", API_KEY)
                         .body(registerData)
                         .post("/register")
                         .then()
                         .spec(missingFieldResponseSpec)
-                        .extract().as(ErrorResponseLombokModel.class));
+                        .extract().as(ErrorResponse.class));
 
         step("Check error message", () ->
                 assertEquals("Missing email or username", response.getError()));
@@ -141,14 +135,14 @@ public class ReqresTests {
     @Test
     @DisplayName("Get users list")
     void getUsersListTest() {
-        UsersListResponseLombokModel response = step("Get users list", () ->
+        UsersListResponse response = step("Get users list", () ->
                 given(registerRequestSpec)
                         .header("x-api-key", API_KEY)
                         .queryParam("page", "2")
                         .get("/users")
                         .then()
                         .spec(registerResponseSpec)
-                        .extract().as(UsersListResponseLombokModel.class));
+                        .extract().as(UsersListResponse.class));
 
         step("Check response data", () -> {
             assertEquals(2, response.getPage());
@@ -160,13 +154,13 @@ public class ReqresTests {
     @Test
     @DisplayName("Get single user")
     void getSingleUserTest() {
-        UserDataLombokModel response = step("Get single user", () ->
+        UserData response = step("Get single user", () ->
                 given(registerRequestSpec)
                         .header("x-api-key", API_KEY)
                         .get("/users/2")
                         .then()
                         .spec(registerResponseSpec)
-                        .extract().jsonPath().getObject("data", UserDataLombokModel.class));
+                        .extract().jsonPath().getObject("data", UserData.class));
 
         step("Check user data", () -> {
             assertEquals(2, response.getId());

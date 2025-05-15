@@ -1,9 +1,13 @@
-package models.lombok;
+package models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class UserDataLombokModel {
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserData {
     private Integer id;
     private String email;
     private String first_name;
